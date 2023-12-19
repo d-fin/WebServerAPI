@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging.Abstractions;
 using System; 
 using System.IO;
 using System.Threading.Tasks;
@@ -11,54 +12,75 @@ namespace WebServerAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UploadFileController : Controller
+    public class UploadFileController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
         private readonly MyDbContext _context;
 
-        public UploadFileController(IConfiguration configuration, MyDbContext dbContext)
+        public UploadFileController(MyDbContext context)
         {
-            _configuration = configuration;
-            _context = dbContext;
+            _context = context;
         }
 
+        // UploadFileAsync() handles what happens when a file is uploaded from the files page. 
         [HttpPost]
-        public async Task<IActionResult> UploadFile()
+        public async Task<IActionResult> UploadFileAsync()
         {
             try
             {
-                var file = Request.Form.Files[0]; 
+                // get the file from the request and make sure it isn't null.
+                var file = Request.Form.Files.GetFile("file");
 
-                if (file.Length > 0)
+                if (file == null || file.Length == 0)
                 {
-                    var fileName = Path.GetFileName(file.FileName);
-                    var filePath = Path.Combine("YourUploadDirectory", fileName); // Replace with the actual directory path
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await file.CopyToAsync(stream);
-                    }
-
-                    var fileRecord = new FileRecord
-                    {
-                        FilePath = filePath,
-                        FileName = fileName,
-                        UploadDate = DateTime.Now
-                    };
-
-                    _context.FileRecord.Add(fileRecord);
-                    await _context.SaveChangesAsync();
-
-                    return Ok("File uploaded and record saved successfully.");
+                    return BadRequest("No file uploaded");
                 }
-                else
+
+                // copy the file to the server location. 
+                var destinationPath = Path.Combine("D:\\Test-CloudStorage", file.FileName);
+                using (var stream = new FileStream(destinationPath, FileMode.Create))
                 {
-                    return BadRequest("No file uploaded.");
+                    await file.CopyToAsync(stream);
                 }
+
+                // once the file is copied, we need to create an instance of FileRecord. 
+                // File record does the following: 
+                //      - stores the file name. 
+                //      - stores the file location on the server.
+                //      - stores the date the file was copied to my server. 
+
+                var fileRecord = new FileRecord 
+                { 
+                    FileName = file.FileName,
+                    FilePath = destinationPath,
+                    UploadDate = DateTime.UtcNow,
+                };
+
+                // save to the database.
+                _context.Add(fileRecord);
+                await _context.SaveChangesAsync();
+                
+                return Ok("File uploaded and saved to server");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex}");
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+            
+        }
+
+        // GetFilesAsync() handles populating the table that shows all of the files stored on my server. 
+        [HttpGet]
+        public async Task<IActionResult> GetFilesAsync()
+        {
+            try
+            {
+                var data = _context.Files.ToList();
+
+                return Ok(data); 
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
     }

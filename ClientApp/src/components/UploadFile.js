@@ -1,8 +1,9 @@
-﻿import React from 'react';
+﻿import React, { useState } from 'react';
+import './UploadFile.css';
 
 const UploadFile = () => {
 
-    const [selectedFile, setSelectedFile] = useState(null);
+    const [selectedFile, setSelectedFile] = useState();
 
     const handleFileChange = (event) => {
         setSelectedFile(event.target.files[0]);
@@ -12,7 +13,9 @@ const UploadFile = () => {
         const formData = new FormData();
         formData.append('file', selectedFile);
 
-        fetch('/api/upload', {
+        console.log(formData);
+
+        fetch('https://localhost:7165/api/UploadFile', {
             method: 'POST',
             body: formData,
         })
@@ -26,15 +29,13 @@ const UploadFile = () => {
     };
 
     return (
-        <main>
-            <div>
-                <h1>Upload Files</h1>
-            </div>
-            <div>
+        <div>
+            <div class="container-upload">         
                 <input type="file" onChange={handleFileChange} />
                 <button onClick={handleUpload}>Upload</button>
             </div>
-        </main>
+        </div>
+        
     );
 };
 

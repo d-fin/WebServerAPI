@@ -9,6 +9,6 @@ namespace WebServerAPI.Data;
 public class MyDbContext : DbContext
 {
     public MyDbContext(DbContextOptions<MyDbContext> options) : base(options) { }
-    public DbSet<Models.FileRecord> FileRecord { get; set; }
+    public DbSet<FileRecord> Files { get; set; }
     
 }

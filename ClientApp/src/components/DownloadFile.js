@@ -2,10 +2,14 @@
 
 const DownloadFile = () => {
 
+    const handleDownload = () => {
+
+    };
+
     return (
-        <main>
-            <h1>Download Files</h1>
-        </main>
+        <div>
+            <button onClick={handleDownload()}>Download</button>
+        </div>
     );
 }
 
