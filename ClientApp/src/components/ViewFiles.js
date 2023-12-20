@@ -6,6 +6,34 @@ import './ViewFiles.css';
 
 const ViewFile = () => {
     const [data, setData] = useState([]);
+    //const [data, setData] = useState([]);
+    const [selectedFile, setSelectedFile] = useState();
+
+    const handleFileChange = (event) => {
+        setSelectedFile(event.target.files[0]);
+    }
+
+    const handleUpload = () => {
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+
+        fetch('https://localhost:7165/api/UploadFile', {
+            method: 'POST',
+            body: formData,
+        })
+            .then((response) => {
+                if (response.ok) {
+                    console.log("Successfully uploaded file.")
+                    fetchData();
+                }
+            })
+          
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        fetchData();
+    };
+
     useEffect(() => {
         fetchData();
     }, []);
@@ -19,7 +47,6 @@ const ViewFile = () => {
             }
 
             const jsonData = await response.json();
-            console.log(jsonData);
             setData(jsonData);
         }
         catch (error) {
@@ -35,37 +62,81 @@ const ViewFile = () => {
         }
     };
 
-    const handleDownload = (id) => {
-        console.log(id);
-        fetch('https://localhost:7165/api/DownloadFile/$', {
+    const handleDownload = (id, name) => {
+        console.log("file download id = ", id);
+
+        const formData = new FormData();
+        formData.append('id', id);
+
+        fetch('https://localhost:7165/api/DownloadFile', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ id: id }),
+            body: formData, 
         })
-            .then((response) => response.json())
-            .then((data) => {
-                console.log(data);
+            .then((response) => {
+                if (response.ok) {
+                    const filename = name; 
+                    return response.blob()
+                        .then((blob) => {
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = filename;
+                            document.body.appendChild(a);
+                            a.click();
+                            window.URL.revokeObjectURL(url);
+                        });
+                }
+                else {
+                    console.error('Error: ', response.statusText);
+                }
             })
             .catch((error) => {
                 console.error('Error: ', error);
             });
-        
-        
+    };
+
+    const handleDelete = (id, name) => {
+        const confirmed = window.confirm("Are you sure you want to delete the file \"", name, "\"?");
+
+        if (confirmed) {
+            console.log("file delete id = ", id);
+
+            const formData = new FormData();
+            formData.append('id', id);
+
+            fetch('https://localhost:7165/api/DownloadFile', {
+                method: 'DELETE',
+                body: formData,
+            })
+                .then((response) => {
+                    if (response.ok) {
+                        console.log("Successfully deleted the file.");
+                        fetchData();
+                    }
+                })
+                .catch(error => {
+                    console.log("Error: ", error);
+                });
+        }
     };
 
     return (
         <main>
-            <div class="container-header">
-                <h1 class="header">Files</h1>
+            <div className="container-header">
+                <h1 className="header">Files</h1>
             </div>
 
-            <div class="container-uploadButton">
-                <UploadFile /> 
+            <div className="container-uploadButton">
+                {/*<UploadFile /> */}
+                <div>
+                    <div className="container-upload">
+                        <input type="file" onChange={handleFileChange} />
+                        <button onClick={handleUpload}>Upload</button>
+                    </div>
+                </div>
             </div>
 
-            <div class="container-table">
+            <div className="container-table">
                 <table>
                     <thead>
                         <tr>
@@ -73,6 +144,7 @@ const ViewFile = () => {
                             <th>File Path</th>
                             <th>Upload Date</th>
                             <th>Download</th>
+                            <th>Delete</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -82,7 +154,10 @@ const ViewFile = () => {
                                 <td>{item.filePath}</td>
                                 <td>{truncateString(item.uploadDate, 10)}</td>
                                 <td>
-                                    <button class="download-btn" onClick={handleDownload(item.id)}>Download</button>
+                                    <button className="download-btn" onClick={() => handleDownload(item.id, item.fileName)}>Download</button>
+                                </td>
+                                <td>
+                                    <button className="delete-btn" onClick={() => handleDelete(item.id, item.fileName)}>Delete</button>
                                 </td>
                             </tr>
                         ))}

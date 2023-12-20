@@ -1,8 +1,10 @@
+//import Login from './components/api-auth/Login';
 import ApiAuthorzationRoutes from './components/api-authorization/ApiAuthorizationRoutes';
 import DownloadFile from './components/DownloadFile';
 import { Home } from "./components/Home";
 import UploadFile from './components/UploadFile';
 import ViewFile from './components/ViewFiles';
+import Login from './components/api-auth/Login';
 
 const AppRoutes = [
       {
@@ -23,7 +25,11 @@ const AppRoutes = [
           path: '/download-file',
           //requireAuth: true,
           element: <DownloadFile />
-      },
+    },
+    {
+        path: '/login-page',
+        element: <Login/>
+    },
       ...ApiAuthorzationRoutes
 ];
 

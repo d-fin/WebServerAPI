@@ -12,9 +12,14 @@ export class NavMenu extends Component {
 
     this.toggleNavbar = this.toggleNavbar.bind(this);
     this.state = {
-      collapsed: true
+        collapsed: true,
+        isLoggedIn: false
     };
   }
+
+    handleLogin = () => {
+        // here is where i will verify if the user is logged in, to display the Login page or the logout function. 
+    }
 
   toggleNavbar () {
     this.setState({
@@ -36,14 +41,11 @@ export class NavMenu extends Component {
               <NavItem>
                 <NavLink tag={Link} className="text-dark" to="/view-file">Files</NavLink>
               </NavItem>
-              {/*<NavItem>
-                <NavLink tag={Link} className="text-dark" to="/upload-file">Upload Files</NavLink>
-              </NavItem>
               <NavItem>
-                <NavLink tag={Link} className="text-dark" to="/download-file">Download Files</NavLink>
-              </NavItem>*/}
-              <LoginMenu>
-              </LoginMenu>
+                <NavLink tag={Link}className="text-dark" to="/login-page">Login</NavLink>
+              </NavItem>
+              {/*<LoginMenu>
+              </LoginMenu>*/}
             </ul>
           </Collapse>
         </Navbar>
