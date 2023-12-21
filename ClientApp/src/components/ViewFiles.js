@@ -1,12 +1,10 @@
 ﻿import React, { Component, useEffect, useState } from 'react';
-import UploadFile from './UploadFile';
-import DownloadFile from './DownloadFile'
-import './ViewFiles.css';
+import './css/ViewFiles.css';
 
 
 const ViewFile = () => {
     const [data, setData] = useState([]);
-    //const [data, setData] = useState([]);
+    
     const [selectedFile, setSelectedFile] = useState();
 
     const handleFileChange = (event) => {
@@ -15,7 +13,9 @@ const ViewFile = () => {
 
     const handleUpload = () => {
         const formData = new FormData();
+        const username = localStorage.getItem('user')
         formData.append('file', selectedFile);
+        formData.append('username', username);
 
         fetch('https://localhost:7165/api/UploadFile', {
             method: 'POST',
@@ -40,7 +40,8 @@ const ViewFile = () => {
 
     const fetchData = async () => {
         try {
-            const response = await fetch('https://localhost:7165/api/UploadFile');
+            const username = localStorage.getItem("user");
+            const response = await fetch(`https://localhost:7165/api/UploadFile?username=${username}`);
 
             if (!response.ok) {
                 throw new Error("Failed to retrieve data.");
@@ -127,11 +128,18 @@ const ViewFile = () => {
             </div>
 
             <div className="container-uploadButton">
-                {/*<UploadFile /> */}
                 <div>
                     <div className="container-upload">
-                        <input type="file" onChange={handleFileChange} />
-                        <button onClick={handleUpload}>Upload</button>
+                        <label className="upload-button">
+                            Upload File
+                            <input
+                                type="file"
+                                onChange={handleFileChange}
+                                style={{ display: "none" }} 
+                            />
+                        </label>
+                        <div className="gap"></div>
+                        <button className="upload-file-btn" onClick={handleUpload}>Upload</button>
                     </div>
                 </div>
             </div>

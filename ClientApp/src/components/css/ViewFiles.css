@@ -1,0 +1,100 @@
+﻿
+.container-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.header {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.container-uploadButton {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+
+.container-upload {
+    display: inline-block;
+}
+
+.upload-file-btn {
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+    .upload-file-btn:hover,
+    .upload-file-btn:focus {
+        background-color: #0056b3;
+    }
+
+.gap {
+    width: 10px; /* Adjust the width to control the gap size */
+    display: inline-block;
+}
+
+.upload-button {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+}
+
+
+    .upload-button:hover,
+    .upload-button:focus {
+        background-color: #0056b3;
+    }
+
+.container-table {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+th {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px;
+    text-align: left;
+}
+
+tr {
+    background-color: #f2f2f2;
+}
+
+    tr:nth-child(even) {
+        background-color: #ddd;
+    }
+
+td {
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+.download-btn {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.delete-btn {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}

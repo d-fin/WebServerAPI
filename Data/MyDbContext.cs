@@ -10,7 +10,6 @@ public class MyDbContext : DbContext
 {
     public MyDbContext(DbContextOptions<MyDbContext> options) : base(options) { }
     public DbSet<FileRecord> Files { get; set; }
-    public DbSet<LoginUser> LoginUser { get; set; }
-    public DbSet<RegisterUser> RegisterUser { get; set; }
+    public DbSet<User> User { get; set; }
     
 }

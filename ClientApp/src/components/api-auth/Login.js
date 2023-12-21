@@ -1,4 +1,5 @@
 ﻿import React, { Component } from 'react';
+import '../css/Login.css';
 
 class Login extends Component {
     constructor(props) {
@@ -9,8 +10,10 @@ class Login extends Component {
             password: '',
             isLoginSuccessful: false,
             registrationMode: false,
-            registrationUsername: '',
-            registrationPassword: '',
+            firstName: '',
+            lastName: '',
+            email: '',
+            confirmPassword: '',
         };
     }
 
@@ -22,18 +25,66 @@ class Login extends Component {
     handleLoginSubmit = (event) => {
         event.preventDefault();
 
-        // Perform login logic here
         const { username, password } = this.state;
 
         // validate login
+        var formData = new FormData();
+        formData.append("username", username);
+        formData.append("password", password);
+
+        fetch('https://localhost:7165/api/LoginUser', {
+            method: 'POST',
+            body: formData,
+        })
+            .then((response) => {
+                if (response.ok) {
+                    // login was successful
+                    console.log("login successful.");
+
+                    localStorage.setItem('user', username);
+                    this.isLoginSuccessful = true;
+                    window.location.href = '/';
+                } else {
+                    // login failed
+                    console.log("login failed.");
+                    console.log(response.statusText);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
     };
 
     handleRegistrationSubmit = (event) => {
         event.preventDefault();
 
-        const { registrationUsername, registrationPassword } = this.state;
+        const { firstName, lastName, email, password, confirmPassword } = this.state; 
 
-        // handle registration
+        var formData = new FormData();
+        formData.append('firstName', firstName);
+        formData.append('lastName', lastName);
+        formData.append('email', email);
+        formData.append('password', password);
+        formData.append('confirmPassword', confirmPassword);
+
+        fetch('https://localhost:7165/api/RegisterUser', {
+            method: 'POST',
+            body: formData,
+        })
+            .then((response) => {
+                if (response.ok) {
+                    // Registration was successful
+                    console.log("Registration successful.");
+                    this.toggleRegistrationMode();
+                } else {
+                    // Registration failed
+                    console.log("Registration failed.");
+                    console.log(response.statusText);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
     };
 
     toggleRegistrationMode = () => {
@@ -48,8 +99,10 @@ class Login extends Component {
             password,
             isLoginSuccessful,
             registrationMode,
-            registrationUsername,
-            registrationPassword,
+            firstName, 
+            lastName, 
+            email, 
+            confirmPassword,
         } = this.state;
 
         if (isLoginSuccessful) {
@@ -61,26 +114,62 @@ class Login extends Component {
         }
 
         return (
-            <div>
-                <h2>{registrationMode ? 'Register' : 'Login'}</h2>
-                <form onSubmit={registrationMode ? this.handleRegistrationSubmit : this.handleLoginSubmit}>
+            <div className="login-div">
+                <h2 className="login-h2">{registrationMode ? 'Register' : 'Login'}</h2>
+                <form className="login-form" onSubmit={registrationMode ? this.handleRegistrationSubmit : this.handleLoginSubmit}>
+                    {registrationMode && (
+                        <div>
+                            <input
+                                type="text"
+                                name="firstName"
+                                placeholder="First Name"
+                                value={firstName}
+                                onChange={this.handleInputChange}
+                            />
+                        </div>
+                    )}
+                    {registrationMode && (
+                        <div>
+                            <input
+                                type="text"
+                                name="lastName"
+                                placeholder="Last Name"
+                                value={lastName}
+                                onChange={this.handleInputChange}
+                            />
+                        </div>
+                    )}
                     <div>
-                        <label>Username:</label>
+
                         <input
                             type="text"
-                            name={registrationMode ? 'registrationUsername' : 'username'}
-                            value={registrationMode ? registrationUsername : username}
+                            name={registrationMode ? 'email' : 'username'}
+                            placeholder={registrationMode ? 'Email' : 'Username'}
+                            value={registrationMode ? email : username}
                             onChange={this.handleInputChange}
                         />
                     </div>
                     <div>
-                        <label>Password:</label>
                         <input
                             type="password"
-                            name={registrationMode ? 'registrationPassword' : 'password'}
-                            value={registrationMode ? registrationPassword : password}
+                            name="password"
+                            placeholder="Password"
+                            value={password}
                             onChange={this.handleInputChange}
                         />
+                    </div>
+                    <div>
+                        {registrationMode && (
+                            <div>
+                                <input
+                                    type="password"
+                                    name="confirmPassword"
+                                    placeholder="Confirm Password"
+                                    value={confirmPassword}
+                                    onChange={this.handleInputChange}
+                                />
+                            </div>
+                        )}
                     </div>
                     <div>
                         <button type="submit">
@@ -89,7 +178,7 @@ class Login extends Component {
                     </div>
                 </form>
                 <div>
-                    <button onClick={this.toggleRegistrationMode}>
+                    <button className="toggle-button" onClick={this.toggleRegistrationMode}>
                         {registrationMode ? 'Switch to Login' : 'Switch to Register'}
                     </button>
                 </div>

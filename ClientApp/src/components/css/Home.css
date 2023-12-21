@@ -1,7 +1,51 @@
-﻿body {
+﻿/* Add this CSS to your stylesheet or a separate CSS file */
 
-}
-
+/* Container for the description */
 .container-description {
     text-align: center;
+    padding: 20px;
 }
+
+/* Header style */
+.header {
+    font-size: 36px;
+    font-weight: bold;
+    color: #007bff; /* Blue color for emphasis */
+}
+
+/* Subheader style */
+.subheader {
+    font-size: 18px;
+    color: #444;
+    margin-bottom: 20px;
+}
+
+/* Style for the list of goals */
+.goal-list {
+    text-align: left;
+}
+
+    /* Style for the goals list items */
+    .goal-list ul {
+        list-style: none;
+        padding-left: 0;
+    }
+
+        .goal-list ul li {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+            /* Custom bullet style for list items */
+            .goal-list ul li::before {
+                content: "\2022"; /* Bullet character */
+                position: absolute;
+                left: 0;
+                color: #007bff; /* Blue color for emphasis */
+            }
+
+            /* Add hover effect to list items if needed */
+            .goal-list ul li:hover {
+                background-color: #f2f2f2; /* Light gray background on hover */
+            }

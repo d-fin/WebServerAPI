@@ -1,6 +1,6 @@
 ﻿namespace WebServerAPI.Models
 {
-    public class RegisterUser
+    public class User
     {
         public int Id { get; set; }
         public required string FirstName { get; set; }

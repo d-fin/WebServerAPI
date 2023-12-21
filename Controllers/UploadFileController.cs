@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
-using System; 
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using WebServerAPI.Data;
@@ -15,10 +15,10 @@ namespace WebServerAPI.Controllers
     public class UploadFileController : ControllerBase
     {
         private readonly MyDbContext _context;
-
         public UploadFileController(MyDbContext context)
         {
             _context = context;
+            
         }
 
         // UploadFileAsync() handles what happens when a file is uploaded from the files page. 
@@ -29,6 +29,19 @@ namespace WebServerAPI.Controllers
             {
                 // get the file from the request and make sure it isn't null.
                 var file = Request.Form.Files.GetFile("file");
+
+                string? username = Request.Form["username"];
+                var user = _context.User.SingleOrDefault(u => u.Username == username);
+                int id;
+
+                if (user != null)
+                {
+                    id = user.Id;
+                }
+                else
+                {
+                    return BadRequest();
+                }
 
                 if (file == null || file.Length == 0)
                 {
@@ -48,24 +61,25 @@ namespace WebServerAPI.Controllers
                 //      - stores the file location on the server.
                 //      - stores the date the file was copied to my server. 
 
-                var fileRecord = new FileRecord 
-                { 
+                var fileRecord = new FileRecord
+                {
                     FileName = file.FileName,
                     FilePath = destinationPath,
                     UploadDate = DateTime.UtcNow,
+                    userId = id,
                 };
 
                 // save to the database.
                 _context.Add(fileRecord);
                 await _context.SaveChangesAsync();
-                
+
                 return Ok("File uploaded and saved to server");
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
-            
+
         }
 
         // GetFilesAsync() handles populating the table that shows all of the files stored on my server. 
@@ -74,9 +88,20 @@ namespace WebServerAPI.Controllers
         {
             try
             {
-                var data = _context.Files.ToList();
+                string? username = Request.Query["username"];
+                var user = _context.User.SingleOrDefault(u => u.Username == username);
+             
+                if (user != null)
+                {
+                    int id = user.Id;
+                    var data = _context.Files.Where(f => f.userId == id).ToList();
 
-                return Ok(data); 
+                    return Ok(data);
+                }
+                else
+                {
+                    return BadRequest();
+                }
             }
             catch (Exception ex)
             {

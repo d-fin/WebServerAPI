@@ -12,6 +12,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 /*builder.Services.AddDbContext<ApplicationDbContext>(options =>
                                                     options.UseSqlite(connectionString));*/
 
+var fileStorageString = builder.Configuration["FileStorageLocation"];
 // Enable CORS
 builder.Services.AddCors(options =>
 {
@@ -20,6 +21,14 @@ builder.Services.AddCors(options =>
             .WithOrigins("https://localhost:44414") 
             .AllowAnyHeader()
             .AllowAnyMethod());
+});
+
+builder.Services.AddDistributedMemoryCache(); // Use an in-memory cache for storing session data
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Set session timeout (adjust as needed)
+    options.Cookie.HttpOnly = false;
+    options.Cookie.IsEssential = true; // Important for GDPR compliance
 });
 
 builder.Services.AddDbContext<MyDbContext>(options =>
@@ -52,6 +61,7 @@ else
     app.UseHsts();
 }
 
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
@@ -64,7 +74,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller}/{action=Index}/{id?}");
 app.MapRazorPages();
-
+app.UseSession();
 app.MapFallbackToFile("index.html");
 
 app.Run();
